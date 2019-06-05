@@ -104,7 +104,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://spiritpoet.github.io/2019/06/05/FastDFS单机搭建/1.png">
 <meta property="og:image" content="http://spiritpoet.github.io/2019/06/05/FastDFS单机搭建/2.jpg">
-<meta property="og:updated_time" content="2019-06-05T03:17:09.825Z">
+<meta property="og:updated_time" content="2019-06-05T09:08:13.187Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FastDFS单机搭建">
 <meta name="twitter:image" content="http://spiritpoet.github.io/2019/06/05/FastDFS单机搭建/1.png">
@@ -395,7 +395,7 @@
                 
               
 
-              <time title="Created: 2019-06-05 11:01:27 / Modified: 11:17:09" itemprop="dateCreated datePublished" datetime="2019-06-05T11:01:27+08:00">2019-06-05</time>
+              <time title="Created: 2019-06-05 11:01:27 / Modified: 17:08:13" itemprop="dateCreated datePublished" datetime="2019-06-05T11:01:27+08:00">2019-06-05</time>
             
 
             
@@ -506,6 +506,13 @@
 <p>​ 上传文件后运用本机 ip+nginx 监听端口+group_name+remote_filename 的方式</p>
 <p>grop_name 和 remote_filename 就是上面测试成功返回的信息中 画红线 的两个值</p>
 <h4 id="结合-Java-Spring-Boot-框架-构建文件上传服务"><a href="#结合-Java-Spring-Boot-框架-构建文件上传服务" class="headerlink" title="结合 Java Spring Boot 框架 构建文件上传服务"></a>结合 Java Spring Boot 框架 构建文件上传服务</h4><p>这里我不做详细说明：提供一个别人的 github 项目给大家参考 <a href="https://github.com/bojiangzhou/lyyzoo-fastdfs-java" target="_blank" rel="noopener">请点击这里参考</a></p>
+<h4 id="关于-FastDFS-下载文件名不是原来文件名的解决方案"><a href="#关于-FastDFS-下载文件名不是原来文件名的解决方案" class="headerlink" title="关于 FastDFS 下载文件名不是原来文件名的解决方案"></a>关于 FastDFS 下载文件名不是原来文件名的解决方案</h4><p>利用 nginx<br>修改 nginx.conf<br>在代理路径下添加如下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($arg_attname ~ <span class="string">"^(.+)"</span>) &#123;</span><br><span class="line">    #设置下载</span><br><span class="line">    add_header Content-Type application/x-download;</span><br><span class="line">    #设置文件名</span><br><span class="line">    add_header Content-Disposition <span class="string">"attachment;filename=$arg_attname"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<pre><code>完整配置如下</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">location /group1/M00/ &#123;</span><br><span class="line">	root /fastdfs/data;  注释：填写数据存储路径，前面root别忘记</span><br><span class="line">	<span class="keyword">if</span> ($arg_attname ~ <span class="string">"^(.+)"</span>) &#123;</span><br><span class="line">    	#设置下载</span><br><span class="line">    	add_header Content-Type application/x-download;</span><br><span class="line">    	#设置文件名</span><br><span class="line">    	add_header Content-Disposition <span class="string">"attachment;filename=$arg_attname"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	ngx_fastdfs_module;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后在请求后面跟上 ?arg_attname=文件名.后缀</p>
+<p>例如：<br><a href="http://172.16.201.102:9800/gos/M00/00/04/wKgBalz2MJKEA8K5AAABAM3uJVE733.xls?arg_attname=测试.xls" target="_blank" rel="noopener">http://172.16.201.102:9800/gos/M00/00/04/wKgBalz2MJKEA8K5AAABAM3uJVE733.xls?arg_attname=测试.xls</a></p>
 
       
     </div>
@@ -705,7 +712,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FastDFS-单机版搭建"><span class="nav-number">1.</span> <span class="nav-text">FastDFS 单机版搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#目标"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单概念介绍"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">简单概念介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置启动"><span class="nav-number">1.0.0.5.</span> <span class="nav-text">配置启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-nginx-模块"><span class="nav-number">1.0.0.6.</span> <span class="nav-text">配置 nginx 模块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结合-Java-Spring-Boot-框架-构建文件上传服务"><span class="nav-number">1.0.0.7.</span> <span class="nav-text">结合 Java Spring Boot 框架 构建文件上传服务</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FastDFS-单机版搭建"><span class="nav-number">1.</span> <span class="nav-text">FastDFS 单机版搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#目标"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单概念介绍"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">简单概念介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置启动"><span class="nav-number">1.0.0.5.</span> <span class="nav-text">配置启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-nginx-模块"><span class="nav-number">1.0.0.6.</span> <span class="nav-text">配置 nginx 模块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结合-Java-Spring-Boot-框架-构建文件上传服务"><span class="nav-number">1.0.0.7.</span> <span class="nav-text">结合 Java Spring Boot 框架 构建文件上传服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于-FastDFS-下载文件名不是原来文件名的解决方案"><span class="nav-number">1.0.0.8.</span> <span class="nav-text">关于 FastDFS 下载文件名不是原来文件名的解决方案</span></a></li></ol></li></ol></div>
             
 
           </div>
