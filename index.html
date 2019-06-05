@@ -396,7 +396,7 @@
                 
               
 
-              <time title="Created: 2019-06-05 11:01:27 / Modified: 11:09:49" itemprop="dateCreated datePublished" datetime="2019-06-05T11:01:27+08:00">2019-06-05</time>
+              <time title="Created: 2019-06-05 11:01:27 / Modified: 11:12:19" itemprop="dateCreated datePublished" datetime="2019-06-05T11:01:27+08:00">2019-06-05</time>
             
 
             
@@ -436,62 +436,18 @@
 
       
         
-          
-            <h1 id="FastDFS-单机版搭建"><a href="#FastDFS-单机版搭建" class="headerlink" title="FastDFS 单机版搭建"></a>FastDFS 单机版搭建</h1><h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><p>​ 搭建可使用的单服务器版 FastDFS 文件服务器,本文对原理不做阐述，因为作者也没有对 FastDFS 深入研究。如果后续深入研究作者一定再发文更新。</p>
+          <h1 id="FastDFS-单机版搭建"><a href="#FastDFS-单机版搭建" class="headerlink" title="FastDFS 单机版搭建"></a>FastDFS 单机版搭建</h1><h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><p>​ 搭建可使用的单服务器版 FastDFS 文件服务器,本文对原理不做阐述，因为作者也没有对 FastDFS 深入研究。如果后续深入研究作者一定再发文更新。</p>
 <h4 id="简单概念介绍"><a href="#简单概念介绍" class="headerlink" title="简单概念介绍"></a>简单概念介绍</h4><p>架构图</p>
 <p><img src="/2019/06/05/FastDFS单机搭建/1.png" alt="架构图"></p>
-<p>Tracker 服务</p>
-<p>跟踪服务器，主要负责调度 storage 节点与 client 通信，在访问上起负载均衡的作用，和记录 storage 节点的运行状态，是连接 client 和 storage 节点的枢纽</p>
-<p>Storage 服务</p>
-<p>存储服务器，保存文件和文件的 meta data（元数据）；</p>
-<p>Group</p>
-<p>文件组，也称为卷。做集群时一组会有多台服务器，同组服务器上的文件是完全相同的，当文件上传到组内的一台机器后，该文件会同步到同组内的其它所有机器上，起到备份的作用；</p>
-<p>meta data</p>
-<p>文件相关属性，键值对（KeyValue Pair）方式，如：width=1024, height=768；</p>
-<h4 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h4><p>​ 1.操作系统 Centos 6.4</p>
-<p>​ 2.包管理工具 yum (阿里源)</p>
-<p>​ 3.依赖安装</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install perl</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install libevent</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install gcc-c++</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y unzip zip</span><br></pre></td></tr></table></figure>
-
-<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>​ 1.下载相关程序包</p>
-<p>​ <a href="https://github.com/happyfish100" target="_blank" rel="noopener">FastDFS 官方 github 下载地址</a>，注意：要保持版本一致否则会有各种问题。这里我都是下载的 master 版本</p>
-<p>fastdfs-master、 libfastcommon-master、fastdfs-nginx-module-master</p>
-<p>​ 2.解压编译安装</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>首先安装fast公共依赖包</span><br><span class="line">unzip -o libfastcommon-master.zip -d /usr/local</span><br><span class="line">cd /usr/local/libfastcommon-master</span><br><span class="line">./make.sh</span><br><span class="line">./make.sh install</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>公共依赖包安装完，安装主程序包</span><br><span class="line">unzip -o fastdfs-master.zip -d /usr/local</span><br><span class="line">cd /usr/local/fastdfs-master</span><br><span class="line">./make.sh</span><br><span class="line">./make.sh install</span><br><span class="line">cp -r conf/* /etc/fdfs</span><br></pre></td></tr></table></figure>
-
-<p>​ 安装完 libfastcommon-master 和 fastdfs-master 两个程序包，FastDFS 就已经安装完毕了。</p>
-<h4 id="配置启动"><a href="#配置启动" class="headerlink" title="配置启动"></a>配置启动</h4><p>​ 1.配置启动 trackerd</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cd /etc/fdfs/</span><br><span class="line">vi tracker.conf</span><br><span class="line"><span class="meta">#</span>常用配置项</span><br><span class="line">port=22122 #tracker程序的管理端口</span><br><span class="line">base_path=/home/fdfs/work/trackerd #存放tracker程序的 日志和一些数据的文件路径</span><br><span class="line">http.server_port=9999 #http访问tracker程序的端口</span><br><span class="line"><span class="meta">#</span>启动</span><br><span class="line">/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf</span><br><span class="line"><span class="meta">#</span>验证是否启动</span><br><span class="line">ps -ef | grep tracker</span><br></pre></td></tr></table></figure>
-
-<p>​ 2.配置启动 storaged</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cd /etc/fdfs/</span><br><span class="line">vim storage.conf</span><br><span class="line"><span class="meta">#</span>常用配置项</span><br><span class="line">port=23000 #storage程序的管理端口</span><br><span class="line">base_path=/home/fdfs/work/storage  #存放文件和日志的文件路径</span><br><span class="line">tracker_server=本地IP:22122 #指定tracker服务</span><br><span class="line">store_path0=/home/fdfs/work/storage #多仓库配置的时候设置多个(我们单机采用默认的和base_path相同)</span><br><span class="line">http.server_port=9998 #http访问tracker程序的端口</span><br><span class="line"><span class="meta">#</span>启动</span><br><span class="line">/usr/bin/fdfs_trackerd /etc/fdfs/storage.conf</span><br><span class="line"><span class="meta">#</span>验证是否启动</span><br><span class="line">ps -ef | grep storage</span><br></pre></td></tr></table></figure>
-
-<p>​ 3.验证是否可上传文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>这个是查看FastDFS所有的可执行命令</span><br><span class="line">ll /usr/bin/fdfs*</span><br><span class="line"><span class="meta">#</span>验证之前需要修改client.conf配置文件</span><br><span class="line">vim /etc/fdfs/client.conf</span><br><span class="line"><span class="meta">#</span>常用配置</span><br><span class="line">base_path=/home/fdfs/work/client #存放数据及日志文件 (路径文件夹必须存在)</span><br><span class="line">tracker_server=本地IP:22122 #指定tracker服务 (必须修改)</span><br><span class="line">http.tracker_server_port=9995 #http访问tracker程序端口</span><br><span class="line"><span class="meta">#</span>利用 fdfs_test 命令验证，使用方式:/usr/bin/fdfs_test 客户端配置文件地址 upload 上传文件</span><br><span class="line">/usr/bin/fdfs_test /etc/fdfs/client.conf  upload /etc/fdfs/client.conf</span><br><span class="line"><span class="meta">#</span>不包error即成功 会返回很多信息  包括url 但是此时的url是没法访问下载的，我们需要集合nginx</span><br></pre></td></tr></table></figure>
-
-<p>​ 上传成功截图</p>
-<p>​ <img src="/2019/06/05/FastDFS单机搭建/2.jpg" alt="上传成功截图"></p>
-<p>配置完以上两个文件 并成功启动和测试 基本上一个单机版的 FastDFS 就完成 80%了接下来我们需要配置 nginx 完成下载。</p>
-<h4 id="配置-nginx-模块"><a href="#配置-nginx-模块" class="headerlink" title="配置 nginx 模块"></a>配置 nginx 模块</h4><p>​ 1.安装依赖</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>依赖包下载安装</span><br><span class="line">yum -y install zlib zlib-devel openssl openssl--devel pcre pcre-devel</span><br></pre></td></tr></table></figure>
-
-<p>​ 2.解压 nginx 和 fast-nginx-module-master 程序包,下载 nginx 在这里不做阐述，去即<a href="http://nginx.org/en/download.html" target="_blank" rel="noopener">官网下载</a>即可。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span>解压nginx和fastdfs-nginx-module-master</span><br><span class="line"> tar -zxvf /nginx-1.14.2.tar.gz</span><br><span class="line"> unzip -o fastdfs-nginx-module-master.zip -d /usr/local</span><br><span class="line"><span class="meta"> #</span>将/usr/local/fastdfs-nginx-module-master/src/下的mod_fastdfs.conf 复制到/etc/fdfs/下</span><br><span class="line"> cp /usr/local/fastdfs-nginx-module-master/src/mod_fastdfs.conf /etc/fdfs</span><br><span class="line"><span class="meta"> #</span>修改mod_fastdfs.conf</span><br><span class="line"> store_path0=/home/fdfs/work/storage  #仓储路径 最好和storage配置一样</span><br><span class="line"> storage_server_port=23000  #要和storage的port配置一样</span><br><span class="line"> tracker_server=本地IP:22122 #指定tracker服务</span><br><span class="line"> base_path=/home/fdfs/work/storage #存放日志文件和一些数据文件</span><br><span class="line"><span class="meta"> #</span>为nginx添加模块</span><br><span class="line"> ./configure --prefix=/usr/local/nginx/ --add-module=/usr/local/fastdfs-nginx-module-master/src/</span><br><span class="line"> make</span><br><span class="line"> make install #如果是第一次安装nginx  需要install  如果已经存在nginx  则不需要这一步</span><br><span class="line"><span class="meta"> #</span>配置nginx.conf</span><br><span class="line"> server &#123;</span><br><span class="line"> 		listen 监听端口;</span><br><span class="line"> 		server_name 本机IP;</span><br><span class="line"></span><br><span class="line"> 		location /group1/M00/&#123;</span><br><span class="line"> 			ngx_fastdfs_module;</span><br><span class="line"> 		&#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>启动Nginx (如果重启可以采用  平滑重启 -s reload的方式)</span><br></pre></td></tr></table></figure>
-
-<p>​ 3.验证下载</p>
-<p>​ 上传文件后运用本机 ip+nginx 监听端口+group_name+remote_filename 的方式</p>
-<p>grop_name 和 remote_filename 就是上面测试成功返回的信息中 画红线 的两个值</p>
-<h4 id="结合-Java-Spring-Boot-框架-构建文件上传服务"><a href="#结合-Java-Spring-Boot-框架-构建文件上传服务" class="headerlink" title="结合 Java Spring Boot 框架 构建文件上传服务"></a>结合 Java Spring Boot 框架 构建文件上传服务</h4><p>这里我不做详细说明：提供一个别人的 github 项目给大家参考 <a href="https://github.com/bojiangzhou/lyyzoo-fastdfs-java" target="_blank" rel="noopener">请点击这里参考</a></p>
-
+          <!--noindex-->
           
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/06/05/FastDFS单机搭建/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
